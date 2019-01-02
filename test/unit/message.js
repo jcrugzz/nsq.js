@@ -1,7 +1,7 @@
 
 var Message = require('../../lib/message');
 var assert = require('assert');
-var body = new Buffer('135a2ad167d76e45000130363236323534303166363566303038736f6d65206d6573736167652068657265', 'hex');
+var body = Buffer.from('135a2ad167d76e45000130363236323534303166363566303038736f6d65206d6573736167652068657265', 'hex');
 
 describe('Message(buffer)', function(){
   it('should parse the message', function(){
@@ -22,7 +22,7 @@ describe('Message#inspect()', function(){
 describe('Message#json()', function(){
   it('should return parsed json', function(){
     var msg = new Message(body, { features: {} });
-    msg.body = new Buffer('{"foo":"bar"}');
+    msg.body = Buffer.from('{"foo":"bar"}');
     msg.json().should.eql({ foo: 'bar' });
   })
 })

@@ -34,7 +34,7 @@ describe('Reader', function(){
             if (err) return done(err);
           });
         });
-      })
+      });
 
       it('should connect after event handlers are added', function(done){
         var sub = nsq.reader({
@@ -60,6 +60,7 @@ describe('Reader', function(){
           nsqlookupd: ['0.0.0.0:4161'],
           pollInterval: 100
         });
+
         sub.on('message', function(msg){
           msg.finish(done);
         });
@@ -69,7 +70,7 @@ describe('Reader', function(){
             if (err) return done(err);
           });
         });
-      })
+      });
 
       it('should set .timer attribute', function(done){
         var sub = nsq.reader({
@@ -82,7 +83,7 @@ describe('Reader', function(){
           assert(sub.timer !== null);
           done();
         });
-      })
+      });
     });
 
     it('should discard messages after the max attempts', function(done){

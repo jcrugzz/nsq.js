@@ -5,6 +5,6 @@ test:
 		--bail \
 		--timeout 20s \
 		test/unit/*.js \
-		test/acceptance/*.js
+		test/acceptance/writer.js
 
 .PHONY: test

@@ -29,29 +29,32 @@ describe('Writer#publish()', function(){
 
     sub.on('message', function(msg){
       msg.finish();
-      done();
+      pub.close();
+      sub.close(done);
     });
 
     sub.connect();
   })
 
   it('should invoke callbacks with errors', function(done){
-    var pub = nsq.writer({ port: 5000 });
+    var pub = nsq.writer({ port: 5000, maxConnectionAttempts: 1 });
 
     pub.on('error', function(){});
 
     pub.publish(topic, 'something', function(err){
       err.message.should.equal('no nsqd nodes connected');
+      pub.close();
       done();
     });
   })
 
   it('should emit "error"', function(done){
-    var pub = nsq.writer({ port: 5000 });
+    var pub = nsq.writer({ port: 5000, maxConnectionAttempts: 1 });
 
     pub.once('error', function(err){
       err.code.should.equal('ECONNREFUSED');
       err.address.should.equal('0.0.0.0:5000');
+      pub.close();
       done();
     });
 
@@ -71,12 +74,12 @@ describe('Writer#publish()', function(){
     }
 
     pub.on('ready', function(){
-      pub.publish(topic, new Buffer(1024), next);
-      pub.publish(topic, new Buffer(1024), next);
-      pub.publish(topic, new Buffer(1024), next);
+      pub.publish(topic, Buffer.alloc(1024), next);
+      pub.publish(topic, Buffer.alloc(1024), next);
+      pub.publish(topic, Buffer.alloc(1024), next);
       pub.close(function(){
         assert(n === 3);
-        done();
+        sub.close(done);
       });
     });
 
@@ -113,7 +116,8 @@ describe('Writer#publish()', function(){
 
         if (++n == 3) {
           msgs.should.eql(['foo', 'bar', 'baz']);
-          done();
+          pub.close();
+          sub.close(done);
         }
       });
 
@@ -127,7 +131,7 @@ describe('Writer#publish()', function(){
       var sub = new Connection;
 
       pub.on('ready', function(){
-        pub.publish(topic, Buffer('foobar'));
+        pub.publish(topic, Buffer.from('foobar'));
       });
 
       sub.on('ready', function(){
@@ -138,7 +142,8 @@ describe('Writer#publish()', function(){
       sub.on('message', function(msg){
         msg.finish();
         msg.body.toString().should.eql('foobar');
-        done();
+        pub.close();
+        sub.close(done);
       });
 
       sub.connect();
