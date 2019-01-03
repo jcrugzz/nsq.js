@@ -17,7 +17,7 @@
     "debug": "^4.1.1",
     "ms": "^2.1.1",
     "node-int64": "~0.4.0",
-    "nsq-lookup-jc": "~3.0.0",
+    "nsq-lookup-jc": "~3.0.2",
     "set-component": "~1.0.0"
   },
   "devDependencies": {
