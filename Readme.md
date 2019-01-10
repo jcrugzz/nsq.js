@@ -183,9 +183,9 @@ Close the writer's connection(s) and fire the optional [fn] when completed.
 ## Running tests
 
 ```
-nsqd --lookupd-tcp-address=0.0.0.0:4160 &
+nsqd --lookupd-tcp-address=0.0.0.0:4160 --broadcast-address=localhost &
 nsqadmin --lookupd-http-address=0.0.0.0:4161 &
-nsqlookupd &
+nsqlookupd --broadcast-address=localhost &
 make test
 ```
 
