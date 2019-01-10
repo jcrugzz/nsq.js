@@ -22,6 +22,7 @@ describe('Connection', function(){
       assert('version' in conn.features);
       assert('max_rdy_count' in conn.features);
       assert('msg_timeout' in conn.features);
+      conn.close();
       done();
     });
   })
@@ -41,6 +42,8 @@ describe('Connection', function(){
 
     sub.on('message', function(msg){
       msg.finish();
+      pub.close();
+      sub.close();
       done();
     });
 
@@ -72,6 +75,7 @@ describe('Connection', function(){
         called++;
       });
       assert.equal(called, 1);
+      conn.close();
       done();
     });
 
@@ -84,6 +88,7 @@ describe('Connection', function(){
     conn.on('ready', function(){
       conn.destroy();
       conn.sock.emit('error', new Error);
+      conn.close();
       done();
     });
     conn.connect();
@@ -95,8 +100,14 @@ describe('Connection', function(){
     conn.on('ready', function(){
       conn.end();
       conn.publish(topic, 'stuff');
-      conn.on('error', done);
-      conn.on('end', done);
+      conn.on('error', function(){
+        conn.close();
+        done.apply(null, arguments);
+      });
+      conn.on('end', function(){
+        conn.close();
+        done.apply(null, arguments);
+      });
     });
   });
 })

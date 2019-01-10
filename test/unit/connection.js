@@ -80,11 +80,12 @@ describe('Connection#connect(fn)', function(){
 
       conn.on('message', function(msg){
         msg.attempts.should.eql(1);
+        conn.close();
         done();
       });
 
       framerData.forEach(function(data){
-        conn.framer.write(new Buffer(data, 'hex'));
+        conn.framer.write(Buffer.from(data, 'hex'));
       });
     });
 
@@ -103,7 +104,7 @@ describe('Connection#command(name, args, data)', function(){
       }
     };
 
-    conn.command('PUB', ['events'], new Buffer('foo bar'));
+    conn.command('PUB', ['events'], Buffer.from('foo bar'));
     writes.toString().should.eql('PUB events\n\u0000\u0000\u0000\u0007foo bar');
   })
 })

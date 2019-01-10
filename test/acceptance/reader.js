@@ -12,8 +12,8 @@ describe('Reader', function(){
     utils.deleteTopic(topic, function(){
       topic = uid();
       done();
-    })
-  })
+    });
+  });
 
   describe('Reader()', function(){
     describe('with .nsqd addresses', function(){
@@ -26,6 +26,8 @@ describe('Reader', function(){
         });
 
         sub.on('message', function(msg){
+          pub.close();
+          sub.close();
           msg.finish(done);
         });
 
@@ -34,7 +36,7 @@ describe('Reader', function(){
             if (err) return done(err);
           });
         });
-      })
+      });
 
       it('should connect after event handlers are added', function(done){
         var sub = nsq.reader({
@@ -47,7 +49,9 @@ describe('Reader', function(){
           sub.emit('done');
         };
 
-        sub.on('done', done);
+        sub.on('done', function(){
+          sub.close(done);
+        });
       });
     });
 
@@ -60,7 +64,10 @@ describe('Reader', function(){
           nsqlookupd: ['0.0.0.0:4161'],
           pollInterval: 100
         });
+
         sub.on('message', function(msg){
+          pub.close();
+          sub.close();
           msg.finish(done);
         });
 
@@ -69,7 +76,7 @@ describe('Reader', function(){
             if (err) return done(err);
           });
         });
-      })
+      });
 
       it('should set .timer attribute', function(done){
         var sub = nsq.reader({
@@ -80,9 +87,9 @@ describe('Reader', function(){
 
         setImmediate(function(){
           assert(sub.timer !== null);
-          done();
+          sub.close(done);
         });
-      })
+      });
     });
 
     it('should discard messages after the max attempts', function(done){
@@ -96,6 +103,8 @@ describe('Reader', function(){
 
       sub.once('discard', function(msg){
         sub.removeAllListeners('message');
+        pub.close();
+        sub.close();
         done();
       });
 
@@ -124,6 +133,8 @@ describe('Reader', function(){
         if (attempts === 1) {
           msg.requeue(null, function(err) { assert(!err); });
         } else {
+          pub.close();
+          sub.close();
           msg.finish(done);
         }
 
@@ -144,8 +155,8 @@ describe('Reader', function(){
       topic = newTopic;
       utils.deleteTopic(oldTopic, function(){
         utils.createTopic(newTopic, done);
-      })
-    })
+      });
+    });
 
     it('should wait for pending messages and emit "close"', function(done){
       var pub = nsq.writer();
@@ -166,7 +177,7 @@ describe('Reader', function(){
 
       sub.on('close', function(){
         assert(recv < 30, 'received too many messages');
-        done();
+        pub.close(done);
       });
 
       sub.on('message', function(msg){
@@ -175,8 +186,8 @@ describe('Reader', function(){
           msg.finish();
         }, 50);
       });
-    })
-  })
+    });
+  });
 
   describe('Reader#close(fn)', function(){
     it('should wait for pending messages and invoke the callback', function(done){
@@ -201,16 +212,15 @@ describe('Reader', function(){
           if (recv++ == 10) {
             sub.close(function(){
               assert(recv < 30, 'received too many messages');
-              done();
+              pub.close(done);
             });
           }
           msg.finish();
         }, 50);
       });
-    })
+    });
 
     it('should close if there are no in-flight messages', function(done){
-      var pub = nsq.writer();
       var sub = nsq.reader({
         topic: topic,
         channel: 'reader',
@@ -225,8 +235,8 @@ describe('Reader', function(){
           sub.close(done);
         }, 100);
       });
-    })
-  })
+    });
+  });
 
   describe('Reader#close(fn)', function(){
     it('should stop polling nsqlookupd if reader had been closed', function(done){
@@ -245,6 +255,6 @@ describe('Reader', function(){
       });
 
       setTimeout(done, 500);
-    })
-  })
+    });
+  });
 });

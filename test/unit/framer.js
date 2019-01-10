@@ -32,7 +32,7 @@ describe('Framer', function(){
     });
 
     framerData.forEach(function(data){
-      framer.write(new Buffer(data, 'hex'));
+      framer.write(Buffer.from(data, 'hex'));
     });
   })
 })
