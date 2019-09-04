@@ -4,8 +4,9 @@ var utils = require('../utils');
 var assert = require('assert');
 var nsq = require('../..');
 var uid = require('uid');
+var sinon = require('sinon');
 
-describe('Writer#publish()', function(){
+describe.only('Writer#publish()', function(){
   var topic = uid();
   afterEach(function(done){
     utils.deleteTopic(topic, function(){
@@ -36,13 +37,15 @@ describe('Writer#publish()', function(){
     sub.connect();
   })
 
-  it('should invoke callbacks with errors', function(done){
-    var pub = nsq.writer({ port: 5000, maxConnectionAttempts: 1 });
+  it('should invoke callbacks with errors after retry', function(done){
+    var pub = nsq.writer({ port: 5000, maxConnectionAttempts: 1, retry: { retries: 1}});
+    var spy = sinon.spy(pub.conns, 'values');
 
     pub.on('error', function(){});
 
     pub.publish(topic, 'something', function(err){
       err.message.should.equal('no nsqd nodes connected');
+      assert.equal(spy.callCount, 2);
       pub.close();
       done();
     });
