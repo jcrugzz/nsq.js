@@ -46,6 +46,7 @@ describe.only('Writer#publish()', function(){
     pub.publish(topic, 'something', function(err){
       err.message.should.equal('no nsqd nodes connected');
       assert.equal(spy.callCount, 2);
+      spy.restore();
       pub.close();
       done();
     });
