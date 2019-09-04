@@ -6,7 +6,7 @@ var nsq = require('../..');
 var uid = require('uid');
 var sinon = require('sinon');
 
-describe.only('Writer#publish()', function(){
+describe('Writer#publish()', function(){
   var topic = uid();
   afterEach(function(done){
     utils.deleteTopic(topic, function(){
