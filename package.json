@@ -1,6 +1,6 @@
 {
   "name": "nsq.js-k8",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "repository": "jcrugzz/nsq.js",
   "description": "NSQ client actually written in javascript",
   "scripts": {
